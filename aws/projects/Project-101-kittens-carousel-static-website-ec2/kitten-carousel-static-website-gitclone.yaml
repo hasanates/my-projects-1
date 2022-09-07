@@ -1,0 +1,56 @@
+AWSTemplateFormatVersion: 2010-09-09
+
+Resources:
+  Ec2ApacheInstance:
+    Type: AWS::EC2::Instance
+    Properties:
+      ImageId: ami-05fa00d4c63e32376
+      InstanceType: t2.micro
+      Tags:
+        - Key: Name
+          Value: My Apache Server
+  
+      UserData: 
+        Fn::Base64:
+          !Sub |
+            #!/bin/bash
+            sudo yum update -y
+            sudo yum install -y httpd.x86_64
+            systemctl start httpd.service
+            systemctl enable httpd.service
+            sudo yum install wget -y
+            systemctl start wget.service
+            sudo yum install git -y
+            sudo rm -rf /var/www/html/index.html
+            cd /var/www/html/
+            sudo git clone https://github.com/fatihabdioglu/pro1.git # changeit
+            cd pro1/ #content cat jpegs
+            sudo cp * ../
+            cd ../
+            sudo rm -r pro1/
+      
+      KeyName: "firstkey"
+      SecurityGroups:
+        - !Ref ApacheSecurityGroup
+
+  ApacheSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: My Apache Security Group
+      GroupName: My APache SG
+    
+      SecurityGroupIngress:
+        - IpProtocol: "tcp"
+          CidrIp: "0.0.0.0/0"
+          FromPort: 80
+          ToPort: 80
+
+        - IpProtocol: "tcp"
+          CidrIp: "0.0.0.0/0"
+          FromPort: 443
+          ToPort: 443   
+
+        - IpProtocol: "tcp"
+          CidrIp: "0.0.0.0/0"
+          FromPort: 22
+          ToPort: 22                 

@@ -1,0 +1,30 @@
+AWSTemplateFormatVersion: 2010-09-09
+
+Description: |
+  This template creates an EC2 instance to run static web site with Apache web server
+Resources:
+  Instance: 
+    Type: AWS::EC2::Instance
+    Properties:
+      ImageId: ami-05fa00d4c63e32376
+      InstanceType: t2.micro
+      KeyName: firstkey #please use your key pair name without pem.
+      SecurityGroups: 
+        - http-ssh-sec-grp #please use your security group name. Allow port 22-80
+      Tags:
+        - Key: Name 
+          Value: "Web Server Of Mustafa"
+      UserData:
+        Fn::Base64: |
+          #!/bin/bash
+          sudo yum update -y
+          sudo yum install httpd -y
+          sudo systemctl start httpd
+          sudo systemctl enable httpd
+          sudo chmod -R 777 /var/www/html
+          cd /var/www/html
+          wget https://raw.githubusercontent.com/karacaaslan/my-projects/main/aws/projects/Project-101-kittens-carousel-static-website-ec2/static-web/index.html
+          wget https://raw.githubusercontent.com/karacaaslan/my-projects/main/aws/projects/Project-101-kittens-carousel-static-website-ec2/static-web/cat0.jpg
+          wget https://raw.githubusercontent.com/karacaaslan/my-projects/main/aws/projects/Project-101-kittens-carousel-static-website-ec2/static-web/cat1.jpg
+          wget https://raw.githubusercontent.com/karacaaslan/my-projects/main/aws/projects/Project-101-kittens-carousel-static-website-ec2/static-web/cat2.jpg
+          wget https://raw.githubusercontent.com/karacaaslan/my-projects/main/aws/projects/Project-101-kittens-carousel-static-website-ec2/static-web/cat3.png
